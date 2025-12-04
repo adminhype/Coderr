@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
 from profile_app.models import UserProfile
-from profile_app.api.serializers import UserProfileSerializer
+from profile_app.api.serializers import BusinessProfileListSerializer, CustomerProfileListSerializer, UserProfileSerializer
 from profile_app.api.permissions import isOwnerOrReadOnly
 
 
@@ -18,3 +18,17 @@ class UserProfileDetailView(generics.RetrieveUpdateAPIView):
 
         self.check_object_permissions(self.request, obj)
         return obj
+
+
+class BusinessProfileListView(generics.ListAPIView):
+    queryset = UserProfile.objects.filter(user_type='business')
+    serializer_class = BusinessProfileListSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = None
+
+
+class CustomerProfileListView(generics.ListAPIView):
+    queryset = UserProfile.objects.filter(user_type='customer')
+    serializer_class = CustomerProfileListSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = None

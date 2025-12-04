@@ -45,3 +45,43 @@ class UserProfileSerializer(serializers.ModelSerializer):
         user.save()
 
         return super().update(instance, validated_data)
+
+
+class BusinessProfileListSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        source='user.username', read_only=True)
+    type = serializers.CharField(source='user_type', read_only=True)
+    user = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            'user',
+            'username',
+            'first_name',
+            'last_name',
+            'file',
+            'location',
+            'tel',
+            'description',
+            'working_hours',
+            'type',
+        ]
+
+
+class CustomerProfileListSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        source='user.username', read_only=True)
+    type = serializers.CharField(source='user_type', read_only=True)
+    user = serializers.IntegerField(source='user.id', read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            'user',
+            'username',
+            'first_name',
+            'last_name',
+            'file',
+            'type'
+        ]
