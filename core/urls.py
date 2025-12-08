@@ -23,7 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('auth_app.api.urls')),
     path('api/', include('profile_app.api.urls')),
-    # path('api/', include('offer_app.api.urls')),
+    path('api/', include('offer_app.api.urls')),
     # path('api/', include('order_app.api.urls')),
     # path('api/', include('review_app.api.urls')),
     # path('api/', include('info_app.api.urls')),

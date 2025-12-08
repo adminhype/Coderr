@@ -1,6 +1,6 @@
 import pytest
 
-# from django.urls import reverse
+from django.urls import reverse
 
 from offer_app.models import Offer, OfferDetail
 
@@ -15,7 +15,7 @@ def test_get_offers_list_strucutre(api_client, user):
     OfferDetail.objects.create(offer=offer, title="backend", offer_type="basic", price=30.00, features=[
                                "django", "rest"], delivery_time_in_days=30, revisions=5)
 
-    url = '/api/offers/'
+    url = reverse('offer-list')
     response = api_client.get(url)
 
     assert response.status_code == 200
