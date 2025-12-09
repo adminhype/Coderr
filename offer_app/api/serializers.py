@@ -24,6 +24,16 @@ class OfferDetailSerializer(serializers.ModelSerializer):
         return f"/offerdetails/{obj.id}/"
 
 
+class OfferDetailAbsoluteSerializer(OfferDetailSerializer):
+    def get_url(self, obj):
+
+        path = f"/api/offerdetails/{obj.id}/"
+        request = self.context.get('request')
+        if request is not None:
+            return request.build_absolute_uri(path)
+        return path
+
+
 class OfferDetailDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferDetail
@@ -87,3 +97,24 @@ class OfferCreateSerializer(serializers.ModelSerializer):
         for detail_data in details_data:
             OfferDetail.objects.create(offer=offer, **detail_data)
         return offer
+
+
+class OfferRetrieveSerializer(serializers.ModelSerializer):
+    details = OfferDetailAbsoluteSerializer(many=True, read_only=True)
+    min_price = serializers.FloatField(read_only=True)
+    min_delivery_time = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Offer
+        fields = [
+            'id',
+            'user',
+            'title',
+            'image',
+            'description',
+            'created_at',
+            'updated_at',
+            'details',
+            'min_price',
+            'min_delivery_time',
+        ]
