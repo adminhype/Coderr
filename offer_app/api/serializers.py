@@ -24,6 +24,20 @@ class OfferDetailSerializer(serializers.ModelSerializer):
         return f"/offerdetails/{obj.id}/"
 
 
+class OfferDetailDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OfferDetail
+        fields = [
+            'id',
+            'title',
+            'revisions',
+            'delivery_time_in_days',
+            'price',
+            'features',
+            'offer_type'
+        ]
+
+
 class OfferListSerializer(serializers.ModelSerializer):
     details = OfferDetailSerializer(many=True, read_only=True)
     user_details = UserDetailSerializer(source='user', read_only=True)
@@ -45,3 +59,31 @@ class OfferListSerializer(serializers.ModelSerializer):
             'min_delivery_time',
             'user_details',
         ]
+
+
+class OfferCreateSerializer(serializers.ModelSerializer):
+    details = OfferDetailDataSerializer(many=True)
+
+    class Meta:
+        model = Offer
+        fields = [
+            'id',
+            'title',
+            'image',
+            'description',
+            'details',
+        ]
+
+    def validate_details(self, value):
+        if len(value) < 3:
+            raise serializers.ValidationError(
+                "At least 3 offer details are required.")
+        return value
+
+    def create(self, validated_data):
+        details_data = validated_data.pop('details')
+        offer = Offer.objects.create(**validated_data)
+
+        for detail_data in details_data:
+            OfferDetail.objects.create(offer=offer, **detail_data)
+        return offer
