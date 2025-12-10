@@ -19,7 +19,7 @@ def api_client():
 @pytest.fixture
 def business_user():
     user = User.objects.create_user(
-        username='bob', password='123', email='bob@example.com')
+        username='bobbusiness', password='123', email='bob@example.com')
     UserProfile.objects.create(user=user, user_type='business')
     return user
 
@@ -27,14 +27,22 @@ def business_user():
 @pytest.fixture
 def customer_user():
     user = User.objects.create_user(
-        username='morty', password='123', email='morty@example.com')
+        username='mortycustomer', password='123', email='morty@example.com')
     UserProfile.objects.create(user=user, user_type='customer')
     return user
 
 
 @pytest.fixture
+def user():
+    user = User.objects.create_user(
+        username='randomuser', password='123', email='randomuser@example.com')
+    UserProfile.objects.create(user=user, user_type='other')
+    return user
+
+
+@pytest.fixture
 def offer(business_user):
-    return Offer.objects.create(user=business_user, title="test offer", description="desc")
+    return Offer.objects.create(user=business_user, title="test offer", description="test description")
 
 
 @pytest.fixture
