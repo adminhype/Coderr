@@ -1,5 +1,7 @@
 import pytest
+
 from django.urls import reverse
+
 from offer_app.models import Offer
 
 
