@@ -7,9 +7,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 from offer_app.models import Offer
-from .serializers import OfferListSerializer, OfferCreateSerializer, OfferRetrieveSerializer
+from .serializers import OfferListSerializer, OfferCreateSerializer, OfferRetrieveSerializer, OfferUpdateSerializer
 from .filters import OfferFilter
-from .permissions import IsBusinessUser
+from .permissions import IsOwner, IsBusinessUser
 
 
 class OfferViewSet(viewsets.ModelViewSet):
@@ -32,6 +32,8 @@ class OfferViewSet(viewsets.ModelViewSet):
             return OfferCreateSerializer
         if self.action == 'retrieve':
             return OfferRetrieveSerializer
+        if self.action in ['update', 'partial_update']:
+            return OfferUpdateSerializer
         return OfferListSerializer
 
     def get_permissions(self):
@@ -39,6 +41,8 @@ class OfferViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated(), IsBusinessUser()]
         if self.action == 'list':
             return [AllowAny()]
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [IsAuthenticated(), IsOwner()]
         return [IsAuthenticated()]
 
     def perform_create(self, serializer):
