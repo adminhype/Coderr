@@ -21,14 +21,13 @@ def test_get_orders_as_customer(api_client, customer_user, business_user):
 
     api_client.force_authenticate(user=customer_user)
 
-    url = '/api/orders/'
-    # url = reverse("orders-list")
+    url = reverse("order-list")
     response = api_client.get(url)
 
     assert response.status_code == 200
     assert len(response.data) == 1
     assert response.data[0]['title'] == "my order"
-    assert response.data[0]['customer'] == customer_user.id
+    assert response.data[0]['customer_user'] == customer_user.id
 
 
 @pytest.mark.django_db
@@ -46,18 +45,17 @@ def test_get_orders_as_business(api_client, customer_user, business_user):
 
     api_client.force_authenticate(user=business_user)
 
-    url = '/api/orders/'
-    # url = reverse("orders-list")
+    url = reverse("order-list")
     response = api_client.get(url)
 
     assert response.status_code == 200
     assert len(response.data) == 1
     assert response.data[0]['title'] == "business job"
-    assert response.data[0]['business'] == business_user.id
+    assert response.data[0]['business_user'] == business_user.id
 
 
 @pytest.mark.django_db
-def test_get_orders_unauthenticated(api_client, user, customer_user, business_user):
+def test_get_orders_isolated_user(api_client, user, customer_user, business_user):
 
     Order.objects.create(
         customer_user=customer_user,
@@ -71,9 +69,9 @@ def test_get_orders_unauthenticated(api_client, user, customer_user, business_us
 
     api_client.force_authenticate(user=user)
 
-    url = '/api/orders/'
-    # url = reverse("orders-list")
+    url = reverse("order-list")
     response = api_client.get(url)
 
     assert response.status_code == 200
     assert len(response.data) == 0
+    assert response.data == []
