@@ -16,8 +16,8 @@ def test_create_order(api_client, customer_user, business_user, offer_detail):
         'offer_detail_id': offer_detail.id,
     }
 
-    url = '/api/orders/'
-    response = api_client.post(url, format='json')
+    url = reverse('order-list')
+    response = api_client.post(url, data=payload, format='json')
 
     assert response.status_code == 201
 
@@ -40,8 +40,8 @@ def test_create_order_forbidden_for_business_user(api_client, business_user, off
         'offer_detail_id': offer_detail.id,
     }
 
-    url = '/api/orders/'
-    response = api_client.post(url, format='json')
+    url = reverse('order-list')
+    response = api_client.post(url, data=payload, format='json')
 
     assert business_user.profile.user_type == 'business'
     assert response.status_code == 403
@@ -56,7 +56,7 @@ def test_create_order_invalid_id(api_client, customer_user):
     payload = {
         'offer_detail_id': 11122025,
     }
-    url = '/api/orders/'
-    response = api_client.post(url, format='json')
+    url = reverse('order-list')
+    response = api_client.post(url, data=payload, format='json')
 
     assert response.status_code in [400, 404]
