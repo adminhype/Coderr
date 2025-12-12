@@ -1,13 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from django.db.models import Q
 
 from offer_app.models import OfferDetail
-from order_app.api.permissions import IsCustomerUser
+from order_app.api.permissions import IsCustomerUser, IsOrderBusinessUser
 from order_app.models import Order
-from .serializers import OrderSerializer, OrderCreateSerializer
+from .serializers import OrderSerializer, OrderCreateSerializer, OrderUpdateSerializer
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -16,16 +16,24 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        if user.is_staff:
+            return Order.objects.all().order_by('-created_at')
         return Order.objects.filter(Q(customer_user=user) | Q(business_user=user)).order_by('-created_at')
 
     def get_serializer_class(self):
         if self.action == 'create':
             return OrderCreateSerializer
+        if self.action in ['update', 'partial_update']:
+            return OrderUpdateSerializer
         return OrderSerializer
 
     def get_permissions(self):
+        if self.action == 'destroy':
+            return [IsAdminUser()]
         if self.action == 'create':
             return [IsAuthenticated(), IsCustomerUser()]
+        if self.action in ['update', 'partial_update']:
+            return [IsAuthenticated(), IsOrderBusinessUser()]
         return [IsAuthenticated()]
 
     def perform_create(self, serializer):

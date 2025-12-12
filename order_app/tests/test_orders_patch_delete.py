@@ -17,7 +17,7 @@ def test_patch_order_status_customer_user(api_client, customer_user, order_obj):
         "status": "completed"
     }
 
-    url = f'/api/orders/{order_obj.id}/'
+    url = reverse('order-detail', kwargs={'pk': order_obj.id})
     response = api_client.patch(url, data=payload, format='json')
 
     assert response.status_code == 403
@@ -28,7 +28,7 @@ def test_delete_order_admin_user(api_client, admin_user, order_obj):
 
     api_client.force_authenticate(user=admin_user)
 
-    url = f'/api/orders/{order_obj.id}/'
+    url = reverse('order-detail', kwargs={'pk': order_obj.id})
     response = api_client.delete(url)
 
     assert response.status_code == 204
@@ -40,7 +40,7 @@ def test_delete_order_business_forbidden(api_client, business_user, order_obj):
 
     api_client.force_authenticate(user=business_user)
 
-    url = f'/api/orders/{order_obj.id}/'
+    url = reverse('order-detail', kwargs={'pk': order_obj.id})
     response = api_client.delete(url)
 
     assert response.status_code == 403
