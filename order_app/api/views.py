@@ -1,13 +1,19 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from django.db.models import Q
+from django.contrib.auth import get_user_model
 
 from offer_app.models import OfferDetail
 from order_app.api.permissions import IsCustomerUser, IsOrderBusinessUser
 from order_app.models import Order
 from .serializers import OrderSerializer, OrderCreateSerializer, OrderUpdateSerializer
+
+
+User = get_user_model()
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -55,3 +61,15 @@ class OrderViewSet(viewsets.ModelViewSet):
             offer_type=offer_detail.offer_type,
             status='in_progress'
         )
+
+
+class BusinessOrderView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, business_user_id):
+        user = get_object_or_404(User, pk=business_user_id)
+
+        count = Order.objects.filter(
+            business_user=user, status='in_progress').count()
+
+        return Response({'order_count': count})
